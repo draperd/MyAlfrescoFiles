@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Login Page</shortname>
+  <family>Default Pages</family>
+  <url>/login</url>
+</webscript>
