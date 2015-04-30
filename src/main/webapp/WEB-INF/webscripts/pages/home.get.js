@@ -1,29 +1,22 @@
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/doclib/doclib.lib.js">
 
-model.jsonModel = {
-   services: [
-      {
-         name: "alfresco/services/LoggingService",
-         config: {
-            loggingPreferences: {
-               enabled: true,
-               all: true
-            }
+var services = [
+   {
+      name: "alfresco/services/LoggingService",
+      config: {
+         loggingPreferences: {
+            enabled: true,
+            all: true
          }
-      },
-      "alfresco/services/NavigationService",
-      "alfresco/services/DocumentService",
-      "alfresco/services/DialogService",
-      "alfresco/services/ContentService",
-      "alfresco/services/ActionService",
-      "alfresco/services/UploadService",
-      "alfresco/services/CrudService",
-      "alfresco/services/LightboxService",
-      "alfresco/services/QuickShareService",
-      "alfresco/services/RatingsService",
-      "alfresco/services/SearchService",
-      "alfresco/services/TagService"
-   ],
+      }
+   },
+   "alfresco/services/LogoutService"
+];
+
+addDocumentLibraryServices(services); 
+
+model.jsonModel = {
+   services: services,
    widgets: [
       {
          id: "MAIN_VERTICAL_LAYOUT",
@@ -47,6 +40,94 @@ model.jsonModel = {
                                     config: {
                                        label: "Home",
                                        targetUrl: "ap/ws/home"
+                                    }
+                                 },
+                                 {
+                                    name: "alfresco/header/AlfMenuBarPopup",
+                                    config: {
+                                       label: "Debug Menu",
+                                       widgets: [
+                                          {
+                                             name: "alfresco/menus/AlfMenuGroup",
+                                             config: {
+                                                label: "Quick Settings",
+                                                widgets: [
+                                                   {
+                                                      name: "alfresco/menus/AlfCheckableMenuItem",
+                                                      config: {
+                                                         label: "Debug Logging",
+                                                         value: "enabled",
+                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
+                                                         checked: true
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfCheckableMenuItem",
+                                                      config: {
+                                                         label: "Show All Logs",
+                                                         value: "all",
+                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
+                                                         checked: true
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfCheckableMenuItem",
+                                                      config: {
+                                                         label: "Show Warning Messages",
+                                                         value: "warn",
+                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
+                                                         checked: false
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfCheckableMenuItem",
+                                                      config: {
+                                                         label: "Show Error Messages",
+                                                         value: "error",
+                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
+                                                         checked: false
+                                                      }
+                                                   }
+                                                ]
+                                             }
+                                          },
+                                          {
+                                             name: "alfresco/menus/AlfMenuGroup",
+                                             config: {
+                                                label: "Logging Configuration",
+                                                widgets: [
+                                                   {
+                                                      name: "alfresco/menus/AlfMenuItem",
+                                                      config: {
+                                                         label: "Update Logging Preferences",
+                                                         publishTopic: "ALF_UPDATE_LOGGING_PREFERENCES"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfMenuItem",
+                                                      config: {
+                                                         label: "Show Pub/Sub Log",
+                                                         publishTopic: "ALF_SHOW_PUBSUB_LOG"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfMenuItem",
+                                                      config: {
+                                                         label: "Show Data Model",
+                                                         publishTopic: "ALF_SHOW_DATA_MODEL"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/menus/AlfMenuItem",
+                                                      config: {
+                                                         label: "Toggle Developer View",
+                                                         publishTopic: "ALF_TOGGLE_DEVELOPER_MODE"
+                                                      }
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
                                     }
                                  }
                               ]
