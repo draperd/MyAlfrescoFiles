@@ -24,7 +24,7 @@
       <dependency>
          <groupId>org.alfresco</groupId>
          <artifactId>aikau</artifactId>
-         <version>1.0.16-SNAPSHOT</version>
+         <version>1.0.16</version>
       </dependency>
       <dependency>
          <groupId>org.springframework.extensions.surf</groupId>
