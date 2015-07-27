@@ -15,6 +15,15 @@ var services = [
 
 addDocumentLibraryServices(services); 
 
+var docLib = getDocLib({
+   siteId: null, 
+   containerId: null, 
+   rootNode: "alfresco://user/home", 
+   rootLabel: "My Files", 
+   rawData: true, 
+   useHash: false
+});
+
 model.jsonModel = {
    services: services,
    widgets: [
@@ -205,6 +214,17 @@ model.jsonModel = {
             ]
          }
       },
-      getDocLib(null, null, "alfresco://user/home", "My Files", true)
+      docLib
    ]
 };
+
+// var breadcrumbTrail =  widgetUtils.findObject(model.jsonModel, "id", "DOCLIB_BREADCRUMB_TRAIL");
+// if (breadcrumbTrail && breadcrumbTrail.config)
+// {
+//    breadcrumbTrail.config.useHash = false;
+// }
+// var docList =  widgetUtils.findObject(model.jsonModel, "id", "DOCLIB_DOCUMENT_LIST");
+// if (docList && docList.config)
+// {
+//    docList.config.useHash = false;
+// }
