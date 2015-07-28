@@ -1,6 +1,7 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/service-filtering.lib.js">
 <import resource="classpath:/alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/doclib/doclib.lib.js">
 
-var services = [
+var pageServices = [
    {
       name: "alfresco/services/LoggingService",
       config: {
@@ -13,7 +14,8 @@ var services = [
    "alfresco/services/LogoutService"
 ];
 
-addDocumentLibraryServices(services); 
+var docLibServices = getDocumentLibraryServices();
+var services = alfAddUniqueServices(pageServices, docLibServices);
 
 var docLib = getDocLib({
    siteId: null, 
@@ -24,6 +26,8 @@ var docLib = getDocLib({
    useHash: false
 });
 
+docLib.config.pubSubScope = "SCOPED_";
+
 model.jsonModel = {
    services: services,
    widgets: [
@@ -31,6 +35,7 @@ model.jsonModel = {
          id: "MAIN_VERTICAL_LAYOUT",
          name: "alfresco/layout/VerticalWidgets",
          config: {
+            // pubSubScope: "SCOPED_",
             widgets: [
                {
                   id: "HEADER_BAR",
