@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<theme>
+   <title>My Alfresco Files Theme</title>
+   <title-id>theme.aikauTestTheme</title-id>
+   <css-tokens>
+      <less-variables>
+         @header-stripe-background-color: #0082c8;
+         @header-stripe-font-color: #fff;
+         
+         @use-legacy-buttons: false;
+
+         @link-font-color: @button-color-default;
+         @link-emphasized-font-color: @button-color-default;
+         @link-text-decoration-hover: underline;
+         @link-title-font-color-hover: @button-color-default;
+         @link-title-text-decoration-hover: underline;
+      </less-variables>
+   </css-tokens>
+</theme>

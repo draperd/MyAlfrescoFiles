@@ -1,5 +1,4 @@
-<import resource="classpath:alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/service-filtering.lib.js">
-<import resource="classpath:/alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/doclib/doclib.lib.js">
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/aikau/webscript/libs/doclib/doclib.lib.js">
 
 var pageServices = [
    {
@@ -11,40 +10,91 @@ var pageServices = [
          }
       }
    },
-   "alfresco/services/LogoutService"
+   "alfresco/services/NavigationService",
+   "alfresco/services/LogoutService",
+   "alfresco/services/CrudService",
+   "alfresco/services/PreferenceService",
+   "alfresco/services/SiteService",
+   {
+      name: "alfresco/services/DocumentService",
+      config: {
+         rawData: true
+      }
+   }
 ];
 
 var docLibServices = getDocumentLibraryServices();
-var services = alfAddUniqueServices(pageServices, docLibServices);
+var services = pageServices.concat(docLibServices);
 
-var docLib = getDocLib({
+var myFilesOptions = {
    siteId: null, 
    containerId: null, 
    rootNode: "alfresco://user/home", 
    rootLabel: "My Files", 
    rawData: true, 
-   useHash: false
-});
+   useHash: false,
+   waitForPageWidgets: false
+};
 
-docLib.config.pubSubScope = "SCOPED_";
+var sitesOptions = {
+   siteId: "{shortName}", 
+   containerId: "documentLibrary", 
+   rootNode: null, 
+   rootLabel: "{title}", 
+   rawData: true, 
+   useHash: false,
+   waitForPageWidgets: false
+};
 
 model.jsonModel = {
    services: services,
    widgets: [
       {
-         id: "MAIN_VERTICAL_LAYOUT",
-         name: "alfresco/layout/VerticalWidgets",
+         name: "alfresco/layout/StripedContent",
          config: {
-            // pubSubScope: "SCOPED_",
+            contentWidth: "950px",
             widgets: [
                {
+                  stripeClass: "header",
                   id: "HEADER_BAR",
-                  name: "alfresco/header/Header",
+                  name: "alfresco/layout/LeftAndRight",
+                  className: "share-header-title",
+                  config:
+                  {
+                     semanticWrapper: "header",
+                     widgets:
+                     [
+                        {
+                           id: "HEADER_LOGO",
+                           name: "alfresco/logo/Logo",
+                           align: "left",
+                           config:
+                           {
+                              logoClasses: "alfresco-logo-large"
+                           }
+                        },
+                        {
+                           id: "HEADER_TITLE",
+                           name: "alfresco/header/Title",
+                           align: "left",
+                           config: {
+                              label: "My Alfresco Files",
+                              setBrowserTitle: "Home"
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  stripeClass: "sub-header",
+                  stripeStyle: "border-bottom: 1px solid #aaa;",
+                  id: "HEADER_TITLE_BAR",
+                  name: "alfresco/layout/LeftAndRight",
                   config: {
                      widgets: [
                         {
                            id: "APP_MENU_BAR",
-                           name: "alfresco/header/AlfMenuBar",
+                           name: "alfresco/menus/AlfMenuBar",
                            align: "left",
                            config: {
                               widgets: [
@@ -55,107 +105,19 @@ model.jsonModel = {
                                        label: "Home",
                                        targetUrl: "ap/ws/home"
                                     }
-                                 },
-                                 {
-                                    name: "alfresco/header/AlfMenuBarPopup",
-                                    config: {
-                                       label: "Debug Menu",
-                                       widgets: [
-                                          {
-                                             name: "alfresco/menus/AlfMenuGroup",
-                                             config: {
-                                                label: "Quick Settings",
-                                                widgets: [
-                                                   {
-                                                      name: "alfresco/menus/AlfCheckableMenuItem",
-                                                      config: {
-                                                         label: "Debug Logging",
-                                                         value: "enabled",
-                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
-                                                         checked: true
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfCheckableMenuItem",
-                                                      config: {
-                                                         label: "Show All Logs",
-                                                         value: "all",
-                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
-                                                         checked: true
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfCheckableMenuItem",
-                                                      config: {
-                                                         label: "Show Warning Messages",
-                                                         value: "warn",
-                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
-                                                         checked: false
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfCheckableMenuItem",
-                                                      config: {
-                                                         label: "Show Error Messages",
-                                                         value: "error",
-                                                         publishTopic: "ALF_LOGGING_STATUS_CHANGE",
-                                                         checked: false
-                                                      }
-                                                   }
-                                                ]
-                                             }
-                                          },
-                                          {
-                                             name: "alfresco/menus/AlfMenuGroup",
-                                             config: {
-                                                label: "Logging Configuration",
-                                                widgets: [
-                                                   {
-                                                      name: "alfresco/menus/AlfMenuItem",
-                                                      config: {
-                                                         label: "Update Logging Preferences",
-                                                         publishTopic: "ALF_UPDATE_LOGGING_PREFERENCES"
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfMenuItem",
-                                                      config: {
-                                                         label: "Show Pub/Sub Log",
-                                                         publishTopic: "ALF_SHOW_PUBSUB_LOG"
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfMenuItem",
-                                                      config: {
-                                                         label: "Show Data Model",
-                                                         publishTopic: "ALF_SHOW_DATA_MODEL"
-                                                      }
-                                                   },
-                                                   {
-                                                      name: "alfresco/menus/AlfMenuItem",
-                                                      config: {
-                                                         label: "Toggle Developer View",
-                                                         publishTopic: "ALF_TOGGLE_DEVELOPER_MODE"
-                                                      }
-                                                   }
-                                                ]
-                                             }
-                                          }
-                                       ]
-                                    }
                                  }
                               ]
                            }
                         },
                         {
                            id: "USER_MENU_BAR",
-                           name: "alfresco/header/AlfMenuBar",
+                           name: "alfresco/menus/AlfMenuBar",
                            align: "right",
                            config: {
                               widgets: [
                                  {
                                     id: "USER_MENU",
-                                    name: "alfresco/header/AlfMenuBarPopup",
+                                    name: "alfresco/menus/AlfMenuBarPopup",
                                     config: {
                                        label: "User Menu",
                                        widgets: [
@@ -166,7 +128,7 @@ model.jsonModel = {
                                                 widgets: [
                                                    {
                                                       id: "LOGOUT",
-                                                      name: "alfresco/header/AlfMenuItem",
+                                                      name: "alfresco/menus/AlfMenuItem",
                                                       config:
                                                       {
                                                          label: "Logout",
@@ -187,49 +149,333 @@ model.jsonModel = {
                   }
                },
                {
-                  id: "HEADER_TITLE_BAR",
-                  name: "alfresco/layout/LeftAndRight",
-                  className: "share-header-title",
-                  config:
-                  {
-                     semanticWrapper: "header",
-                     widgets:
-                     [
+                  name: "alfresco/layout/AlfTabContainer",
+                  config: {
+                     // height: "500px",
+                     tabSelectionTopic: "ALF_SELECT_TAB",
+                     tabDisablementTopic: "ALF_DISABLE_TAB",
+                     tabAdditionTopic: "ALF_ADD_TAB",
+                     tabDeletionTopic: "ALF_DELETE_TAB",
+                     widgets: [
+                        // {
+                        //    name: "alfresco/layout/VerticalWidgets",
+                        //    title: "My Dashboard",
+                        //    config: {
+                        //    }
+                        // },
                         {
-                           id: "HEADER_LOGO",
-                           name: "alfresco/logo/Logo",
-                           align: "left",
-                           config:
-                           {
-                              logoClasses: "alfresco-logo-only"
+                           name: "alfresco/layout/VerticalWidgets",
+                           title: "My Files",
+                           config: {
+                              // pubSubScope: "MY_DOCUMENTS_",
+                              widgets: [
+                                 getDocLibToolbar(myFilesOptions),
+                                 {
+                                    id: "DOCLIB_BREADCRUMB_TRAIL",
+                                    name: "alfresco/documentlibrary/AlfBreadcrumbTrail",
+                                    config: {
+                                       hide: myFilesOptions.docLibPrefrences.hideBreadcrumbTrail,
+                                       rootLabel: myFilesOptions.rootLabel || "root.label",
+                                       lastBreadcrumbIsCurrentNode: true,
+                                       useHash: (myFilesOptions.useHash !== false),
+                                       pathChangeTopic: "ALF_DOCUMENTLIST_PATH_CHANGED",
+                                       lastBreadcrumbPublishTopic: "ALF_NAVIGATE_TO_PAGE",
+                                       lastBreadcrumbPublishPayload: {
+                                          url: "folder-details?nodeRef={currentNode.parent.nodeRef}",
+                                          type: "PAGE_RELATIVE",
+                                          target: "CURRENT"
+                                       },
+                                       lastBreadcrumbPublishPayloadType: "PROCESS",
+                                       lastBreadcrumbPublishPayloadModifiers: ["processInstanceTokens"]
+                                    }
+                                 },
+                                 getDocLibList(myFilesOptions)
+                              ]
                            }
                         },
                         {
-                           id: "HEADER_TITLE",
-                           name: "alfresco/header/Title",
-                           align: "left",
+                           name: "alfresco/layout/VerticalWidgets",
+                           title: "My Sites",
                            config: {
-                              label: "My Alfresco Files",
-                              setBrowserTitle: "Home"
+                              pubSubScope: "MY_SITES_",
+                              widgets: [
+                                 {
+                                    name: "alfresco/lists/AlfList",
+                                    config: {
+                                       waitForPageWidgets: false,
+                                       loadDataPublishTopic: "ALF_CRUD_GET_ALL",
+                                       loadDataPublishPayload: {
+                                         url: "api/people/" + user.name + "/sites"
+                                       },
+                                       itemsProperty: "",
+                                       widgets: [
+                                          {
+                                             name: "alfresco/lists/views/AlfListView",
+                                             config: {
+                                                widgetsForHeader: [
+                                                   {
+                                                      name: "alfresco/lists/views/layouts/HeaderCell",
+                                                      config: {
+                                                         label: "Title"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/lists/views/layouts/HeaderCell",
+                                                      config: {
+                                                         label: "Description"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/lists/views/layouts/HeaderCell",
+                                                      config: {
+                                                         label: "Visibility"
+                                                      }
+                                                   },
+                                                   {
+                                                      name: "alfresco/lists/views/layouts/HeaderCell",
+                                                      config: {
+                                                         label: "Actions"
+                                                      }
+                                                   }
+                                                ],
+                                                widgets: [
+                                                   {
+                                                      name: "alfresco/lists/views/layouts/Row",
+                                                      config: {
+                                                         widgets: [
+                                                            {
+                                                               name: "alfresco/lists/views/layouts/Cell",
+                                                               config: {
+                                                                  additionalCssClasses: "mediumpad",
+                                                                  widgets: [
+                                                                     {
+                                                                        name: "alfresco/renderers/PropertyLink",
+                                                                        config: {
+                                                                           propertyToRender: "title",
+                                                                           useCurrentItemAsPayload: false,
+                                                                           publishTopic: "ALF_ADD_TAB",
+                                                                           publishGlobal: true,
+                                                                           publishPayloadType: "PROCESS",
+                                                                           publishPayloadModifiers: ["processCurrentItemTokens"],
+                                                                           publishPayload: {
+                                                                              widgets: [
+                                                                                 {
+                                                                                    name: "alfresco/layout/VerticalWidgets",
+                                                                                    title: "{title}",
+                                                                                    closable: true,
+                                                                                    selected: true,
+                                                                                    config: {
+                                                                                       pubSubScope: "SITE_SCOPED_{shortName}",
+                                                                                       widgets: [
+                                                                                          getDocLibToolbar(sitesOptions),
+                                                                                          {
+                                                                                             id: "DOCLIB_BREADCRUMB_TRAIL",
+                                                                                             name: "alfresco/documentlibrary/AlfBreadcrumbTrail",
+                                                                                             config: {
+                                                                                                hide: sitesOptions.docLibPrefrences.hideBreadcrumbTrail,
+                                                                                                rootLabel: sitesOptions.rootLabel || "root.label",
+                                                                                                lastBreadcrumbIsCurrentNode: true,
+                                                                                                useHash: (sitesOptions.useHash !== false),
+                                                                                                pathChangeTopic: "ALF_DOCUMENTLIST_PATH_CHANGED",
+                                                                                                lastBreadcrumbPublishTopic: "ALF_NAVIGATE_TO_PAGE",
+                                                                                                lastBreadcrumbPublishPayload: {
+                                                                                                   url: "folder-details?nodeRef={currentNode.parent.nodeRef}",
+                                                                                                   type: "PAGE_RELATIVE",
+                                                                                                   target: "CURRENT"
+                                                                                                },
+                                                                                                lastBreadcrumbPublishPayloadType: "PROCESS",
+                                                                                                lastBreadcrumbPublishPayloadModifiers: ["processInstanceTokens"]
+                                                                                             }
+                                                                                          },
+                                                                                          getDocLibList(sitesOptions)
+                                                                                       ]
+                                                                                    }
+                                                                                 }
+                                                                              ]
+                                                                           }
+                                                                        }
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            },
+                                                            {
+                                                               name: "alfresco/lists/views/layouts/Cell",
+                                                               config: {
+                                                                  additionalCssClasses: "mediumpad",
+                                                                  widgets: [
+                                                                     {
+                                                                        name: "alfresco/renderers/Property",
+                                                                        config: {
+                                                                           propertyToRender: "description"
+                                                                        }
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            },
+                                                            {
+                                                               name: "alfresco/lists/views/layouts/Cell",
+                                                               config: {
+                                                                  additionalCssClasses: "mediumpad",
+                                                                  widgets: [
+                                                                     {
+                                                                        name: "alfresco/renderers/Property",
+                                                                        config: {
+                                                                           propertyToRender: "visibility"
+                                                                        }
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            },
+                                                            {
+                                                               name: "alfresco/lists/views/layouts/Cell",
+                                                               config: {
+                                                                  additionalCssClasses: "mediumpad",
+                                                                  widgets: [
+                                                                     {
+                                                                        name: "alfresco/renderers/PublishAction",
+                                                                        config: {
+                                                                           iconClass: "delete-16",
+                                                                           publishTopic: "ALF_DELETE_SITE",
+                                                                           publishPayloadType: "PROCESS",
+                                                                           publishPayloadModifiers: ["processCurrentItemTokens"],
+                                                                           publishPayload: {
+                                                                              document: {
+                                                                                 shortName: "{shortName}"
+                                                                              }
+                                                                           },
+                                                                           publishGlobal: true,
+                                                                           renderFilter: [
+                                                                              {
+                                                                                 property: "siteManagers",
+                                                                                 contains: [user.name]
+                                                                              }
+                                                                           ]
+                                                                       }
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            }
+                                                         ]
+                                                      }
+                                                   }
+                                                ]
+                                             }
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
                            }
                         }
+                        // ,
+                        // {
+                        //    name: "alfresco/layout/VerticalWidgets",
+                        //    title: "My Tasks",
+                        //    config: {
+                        //       pubSubScope: "MY_TASKS_",
+                        //       widgets: [
+                        //          {
+                        //             name: "alfresco/lists/AlfList",
+                        //             config: {
+                        //                waitForPageWidgets: false,
+                        //                loadDataPublishTopic: "ALF_CRUD_GET_ALL",
+                        //                loadDataPublishPayload: {
+                        //                  url: "slingshot/dashlets/my-tasks"
+                        //                },
+                        //                itemsProperty: "tasks",
+                        //                widgets: [
+                        //                   {
+                        //                      name: "alfresco/lists/views/AlfListView",
+                        //                      config: {
+                        //                         widgetsForHeader: [
+                        //                            {
+                        //                               name: "alfresco/lists/views/layouts/HeaderCell",
+                        //                               config: {
+                        //                                  label: "Description"
+                        //                               }
+                        //                            },
+                        //                            {
+                        //                               name: "alfresco/lists/views/layouts/HeaderCell",
+                        //                               config: {
+                        //                                  label: "Status"
+                        //                               }
+                        //                            },
+                        //                            {
+                        //                               name: "alfresco/lists/views/layouts/HeaderCell",
+                        //                               config: {
+                        //                                  label: "Due Date"
+                        //                               }
+                        //                            }
+                        //                         ],
+                        //                         widgets: [
+                        //                            {
+                        //                               name: "alfresco/lists/views/layouts/Row",
+                        //                               config: {
+                        //                                  widgets: [
+                        //                                     {
+                        //                                        name: "alfresco/lists/views/layouts/Cell",
+                        //                                        config: {
+                        //                                           additionalCssClasses: "mediumpad",
+                        //                                           widgets: [
+                        //                                              {
+                        //                                                 name: "alfresco/renderers/Property",
+                        //                                                 config: {
+                        //                                                    propertyToRender: "description"
+                        //                                                 }
+                        //                                              }
+                        //                                           ]
+                        //                                        }
+                        //                                     },
+                        //                                     {
+                        //                                        name: "alfresco/lists/views/layouts/Cell",
+                        //                                        config: {
+                        //                                           additionalCssClasses: "mediumpad",
+                        //                                           widgets: [
+                        //                                              {
+                        //                                                 name: "alfresco/renderers/Property",
+                        //                                                 config: {
+                        //                                                    propertyToRender: "status"
+                        //                                                 }
+                        //                                              }
+                        //                                           ]
+                        //                                        }
+                        //                                     },
+                        //                                     {
+                        //                                        name: "alfresco/lists/views/layouts/Cell",
+                        //                                        config: {
+                        //                                           additionalCssClasses: "mediumpad",
+                        //                                           widgets: [
+                        //                                              {
+                        //                                                 name: "alfresco/renderers/Date",
+                        //                                                 config: {
+                        //                                                    propertyToRender: "dueDate",
+                        //                                                    simple: true
+                        //                                                 }
+                        //                                              }
+                        //                                           ]
+                        //                                        }
+                        //                                     }
+                        //                                  ]
+                        //                               }
+                        //                            }
+                        //                         ]
+                        //                      }
+                        //                   }
+                        //                ]
+                        //             }
+                        //          }
+                        //       ]
+                        //    }
+                        // }
                      ]
                   }
                }
+               // ,
+               // {
+               //    name: "alfresco/logging/DebugLog"
+               // }
             ]
          }
-      },
-      docLib
+      }
    ]
 };
-
-// var breadcrumbTrail =  widgetUtils.findObject(model.jsonModel, "id", "DOCLIB_BREADCRUMB_TRAIL");
-// if (breadcrumbTrail && breadcrumbTrail.config)
-// {
-//    breadcrumbTrail.config.useHash = false;
-// }
-// var docList =  widgetUtils.findObject(model.jsonModel, "id", "DOCLIB_DOCUMENT_LIST");
-// if (docList && docList.config)
-// {
-//    docList.config.useHash = false;
-// }
