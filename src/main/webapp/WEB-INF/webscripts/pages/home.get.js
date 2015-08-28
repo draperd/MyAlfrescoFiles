@@ -27,23 +27,31 @@ var docLibServices = getDocumentLibraryServices();
 var services = pageServices.concat(docLibServices);
 
 var myFilesOptions = {
+   idPrefix: "MY_FILES_",
    siteId: null, 
    containerId: null, 
    rootNode: "alfresco://user/home", 
    rootLabel: "My Files", 
    rawData: true, 
    useHash: false,
-   waitForPageWidgets: false
+   waitForPageWidgets: false,
+   breadcrumbTrail: {
+      lastBreadcrumbPublishTopic: "NO_OP"
+   }
 };
 
 var sitesOptions = {
+   idPrefix: "{shortName}_",
    siteId: "{shortName}", 
    containerId: "documentLibrary", 
    rootNode: null, 
    rootLabel: "{title}", 
    rawData: true, 
    useHash: false,
-   waitForPageWidgets: false
+   waitForPageWidgets: false,
+   breadcrumbTrail: {
+      lastBreadcrumbPublishTopic: "NO_OP"
+   }
 };
 
 model.jsonModel = {
@@ -170,25 +178,7 @@ model.jsonModel = {
                               // pubSubScope: "MY_DOCUMENTS_",
                               widgets: [
                                  getDocLibToolbar(myFilesOptions),
-                                 {
-                                    id: "DOCLIB_BREADCRUMB_TRAIL",
-                                    name: "alfresco/documentlibrary/AlfBreadcrumbTrail",
-                                    config: {
-                                       hide: myFilesOptions.docLibPrefrences.hideBreadcrumbTrail,
-                                       rootLabel: myFilesOptions.rootLabel || "root.label",
-                                       lastBreadcrumbIsCurrentNode: true,
-                                       useHash: (myFilesOptions.useHash !== false),
-                                       pathChangeTopic: "ALF_DOCUMENTLIST_PATH_CHANGED",
-                                       lastBreadcrumbPublishTopic: "ALF_NAVIGATE_TO_PAGE",
-                                       lastBreadcrumbPublishPayload: {
-                                          url: "folder-details?nodeRef={currentNode.parent.nodeRef}",
-                                          type: "PAGE_RELATIVE",
-                                          target: "CURRENT"
-                                       },
-                                       lastBreadcrumbPublishPayloadType: "PROCESS",
-                                       lastBreadcrumbPublishPayloadModifiers: ["processInstanceTokens"]
-                                    }
-                                 },
+                                 getDocLibBreadcrumbTrail(myFilesOptions),
                                  getDocLibList(myFilesOptions)
                               ]
                            }
@@ -268,25 +258,7 @@ model.jsonModel = {
                                                                                        pubSubScope: "SITE_SCOPED_{shortName}",
                                                                                        widgets: [
                                                                                           getDocLibToolbar(sitesOptions),
-                                                                                          {
-                                                                                             id: "DOCLIB_BREADCRUMB_TRAIL",
-                                                                                             name: "alfresco/documentlibrary/AlfBreadcrumbTrail",
-                                                                                             config: {
-                                                                                                hide: sitesOptions.docLibPrefrences.hideBreadcrumbTrail,
-                                                                                                rootLabel: sitesOptions.rootLabel || "root.label",
-                                                                                                lastBreadcrumbIsCurrentNode: true,
-                                                                                                useHash: (sitesOptions.useHash !== false),
-                                                                                                pathChangeTopic: "ALF_DOCUMENTLIST_PATH_CHANGED",
-                                                                                                lastBreadcrumbPublishTopic: "ALF_NAVIGATE_TO_PAGE",
-                                                                                                lastBreadcrumbPublishPayload: {
-                                                                                                   url: "folder-details?nodeRef={currentNode.parent.nodeRef}",
-                                                                                                   type: "PAGE_RELATIVE",
-                                                                                                   target: "CURRENT"
-                                                                                                },
-                                                                                                lastBreadcrumbPublishPayloadType: "PROCESS",
-                                                                                                lastBreadcrumbPublishPayloadModifiers: ["processInstanceTokens"]
-                                                                                             }
-                                                                                          },
+                                                                                          getDocLibBreadcrumbTrail(sitesOptions),
                                                                                           getDocLibList(sitesOptions)
                                                                                        ]
                                                                                     }
